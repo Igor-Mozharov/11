@@ -14,9 +14,15 @@ class Record:
         self.birthday = ''
 
     def add_phone(self, new_phone):
+        if not Phone.is_phone_valid(new_phone):
+            print('not valid phone')
+            return
         self.phones.append(Phone(new_phone))
 
     def change_phone(self, old_phone, new_phone):
+        if not Phone.is_phone_valid(new_phone):
+            print('not valid phone')
+            return
         for phone in self.phones:
             if phone.value == old_phone:
                 self.phones.append(Phone(new_phone))
@@ -63,8 +69,7 @@ class Name(Field):
 
 class Phone(Field):
     def __init__(self, phone):
-        self._value = None
-        self.value = phone
+        self._value = phone
 
     @property
     def value(self):
@@ -72,10 +77,11 @@ class Phone(Field):
 
     @value.setter
     def value(self, phone):
-        if len(phone) >= 10 and len(phone) <= 12:
-            self._value = phone
-        else:
-            print('invalid len of phone number, must be 10-12 symbols')
+        self._value = phone
+
+    @classmethod
+    def is_phone_valid(cls, value):
+        return 10 <= len(value) <= 12
 
     def __repr__(self):
         return self._value
@@ -84,7 +90,21 @@ class Phone(Field):
 class Birthday(Field):
     def __init__(self, date: str):
         '''date = year.month.day'''
-        self.value = datetime.strptime(date, '%Y.%m.%d').date()
+        try:
+            self.value = datetime.strptime(date, '%Y.%m.%d').date()
+        except ValueError:
+            print('OOPs')
+
+    # @property
+    # def value(self):
+    #     return self._value
+
+    # @value.setter
+    # def value(self, birthday):
+    #     self._value = datetime.strptime(birthday, '%Y.%m.%d').date()
+    #     else:
+    #         if not getattr(self, '_value', False):
+    #             self._value = None
 
     def __repr__(self):
         return self.value
@@ -122,7 +142,7 @@ def add(text_input: str):
         adding = Record(text_input.split()[1])
         adding.add_phone(text_input.split()[2])
         addressbook.add_record(adding)
-        print('Its done')
+        print('.')
     else:
         adder = addressbook.data[text_input.split()[1]]
         adder.add_phone(text_input.split()[2])
@@ -135,7 +155,7 @@ def change(text_input: str):
         old_phone = input('enter phone number to change  ')
         changing = addressbook.data[text_input.split()[1]]
         changing.change_phone(old_phone, text_input.split()[2])
-        print('it was changed')
+        print('.')
     else:
         print('no contact')
 
