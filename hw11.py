@@ -39,16 +39,19 @@ class Record:
 
     def add_birthday(self, birthday):
         '''birthday = year.month.day'''
+        if not Birthday.is_birthday_valid(birthday):
+            print('not valid birthday')
+            return
         self.birthday = Birthday(birthday)
 
     def days_to_birthday(self):
         if self.birthday:
             today = datetime.now().date()
-            if self.birthday.value.replace(year=today.year) >= today:
-                result = self.birthday.value.replace(
+            if self.birthday._value.replace(year=today.year) >= today:
+                result = self.birthday._value.replace(
                     year=today.year) - today
             else:
-                result = self.birthday.value.replace(
+                result = self.birthday._value.replace(
                     year=today.year) - today.replace(year=today.year - 1)
             print(result)
         else:
@@ -59,7 +62,16 @@ class Record:
 
 
 class Field:
-    pass
+    def __init__(self):
+        self._value = ''
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        self._value = value
 
 
 class Name(Field):
@@ -90,24 +102,22 @@ class Phone(Field):
 class Birthday(Field):
     def __init__(self, date: str):
         '''date = year.month.day'''
-        try:
-            self.value = datetime.strptime(date, '%Y.%m.%d').date()
-        except ValueError:
-            print('OOPs')
+        self._value = datetime.strptime(date, '%Y.%m.%d').date()
 
-    # @property
-    # def value(self):
-    #     return self._value
+    @property
+    def value(self):
+        return self._value
 
-    # @value.setter
-    # def value(self, birthday):
-    #     self._value = datetime.strptime(birthday, '%Y.%m.%d').date()
-    #     else:
-    #         if not getattr(self, '_value', False):
-    #             self._value = None
+    @value.setter
+    def value(self, birthday):
+        self._value = datetime.strptime(birthday, '%Y.%m.%d').date()
+
+    @classmethod
+    def is_birthday_valid(cls, value):
+        return 0 < int(value.split('.')[0]) <= datetime.now().date().year and 0 < int(value.split('.')[1]) <= 12 and 0 < int(value.split('.')[2]) <= 31
 
     def __repr__(self):
-        return self.value
+        return self._value
 
 
 addressbook = AddressBook()
