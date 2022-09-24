@@ -6,6 +6,10 @@ class AddressBook(UserDict):
     def add_record(self, record):
         self.data[record.name.value] = record
 
+    def iterator(self):
+        for key, value in self.data.items:
+            yield key, value
+
 
 class Record:
     def __init__(self, new_name, birthday=None):
@@ -40,7 +44,7 @@ class Record:
     def add_birthday(self, birthday):
         '''birthday = year.month.day'''
         if not Birthday.is_birthday_valid(birthday):
-            print('not valid birthday')
+            print('not valid birthday, enter "year.month.day')
             return
         self.birthday = Birthday(birthday)
 
@@ -194,15 +198,25 @@ def phone(text_input: str):
 
 
 def set_birthday(text_input: str):
+    if len(text_input.split()) != 3:
+        print('too long or too short command')
     if text_input.split()[1] in addressbook.data:
-        setting = addressbook.data[text_input.split()[1]]
-        setting.add_birthday(text_input.split()[2])
-        print('done')
+        try:
+            setting = addressbook.data[text_input.split()[1]]
+            setting.add_birthday(text_input.split()[2])
+            print('done')
+        except IndexError:
+            print('enter "year.month.day"')
 
 
+@ input_error
 def show_birthday(text_input: str):
     birthding = addressbook.data[text_input.split()[1]]
     birthding.days_to_birthday()
+
+
+def iterator(_=None):
+    print(addressbook.iterator())
 
 
 USER_INPUT = {
@@ -214,7 +228,8 @@ USER_INPUT = {
     'delete': delete_contact,
     'remove': remove_phone,
     'set_birthday': set_birthday,
-    'birthday': show_birthday
+    'birthday': show_birthday,
+    'iterator': iterator
 }
 
 
