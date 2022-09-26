@@ -6,9 +6,14 @@ class AddressBook(UserDict):
     def add_record(self, record):
         self.data[record.name.value] = record
 
-    def iterator(self):
-        for key, value in self.data.items:
-            yield key, value
+    def iterator(self, size):
+        page = []
+        for item in self.data:
+            page.append(item)
+            if len(page) == size:
+                yield page
+                page = []
+        yield page
 
 
 class Record:
@@ -216,7 +221,9 @@ def show_birthday(text_input: str):
 
 
 def iterator(_=None):
-    print(addressbook.iterator())
+    size = input('enter int size of object ')
+    iterable = addressbook.iterator(size)
+    print(next(iterable))
 
 
 USER_INPUT = {
