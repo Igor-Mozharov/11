@@ -6,14 +6,12 @@ class AddressBook(UserDict):
     def add_record(self, record):
         self.data[record.name.value] = record
 
-    def iterator(self, size):
+    def iterator(self, page_number, page_size):
         page = []
-        for item in self.data:
-            page.append(item)
-            if len(page) == size:
-                yield page
-                page = []
-        yield page
+        all_rec = page_number * page_size
+        for rec in self.data:
+            page.append(rec)
+        yield page[(all_rec-page_size):all_rec]
 
 
 class Record:
@@ -152,7 +150,10 @@ def hello(_=None):
 
 
 def show_all(_=None):
-    print(addressbook.data)
+    page_number = int(input('enter page number pls: '))
+    page_size = int(input('enter how many record we need:  '))
+    doit = addressbook.iterator(page_number, page_size)
+    print(next(doit))
 
 
 @ input_error
@@ -220,12 +221,6 @@ def show_birthday(text_input: str):
     birthding.days_to_birthday()
 
 
-def iterator(_=None):
-    size = input('enter int size of object ')
-    iterable = addressbook.iterator(size)
-    print(next(iterable))
-
-
 USER_INPUT = {
     'hello': hello,
     'add': add,
@@ -235,8 +230,7 @@ USER_INPUT = {
     'delete': delete_contact,
     'remove': remove_phone,
     'set_birthday': set_birthday,
-    'birthday': show_birthday,
-    'iterator': iterator
+    'birthday': show_birthday
 }
 
 
@@ -246,7 +240,7 @@ def main():
         user_input = user_input.lower()
         if user_input == '.':
             break
-        if user_input == 'good bye' or user_input == 'close' or user_input == 'exit':
+        if user_input in ('good bye', 'close', 'exit'):
             print('Good bye!')
             break
         if user_input in USER_INPUT:
