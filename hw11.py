@@ -7,18 +7,17 @@ class AddressBook(UserDict):
         self.data[record.name.value] = record
 
     def iterator(self, page_number, page_size):
-        page = []
+        self.data = list(self.data.items())
         all_rec = page_number * page_size
         for rec in self.data:
-            page.append(rec)
-        yield page[(all_rec-page_size):all_rec]
+            yield self.data[(all_rec-page_size):all_rec]
 
 
 class Record:
     def __init__(self, new_name, birthday=None):
         self.name = Name(new_name)
         self.phones = []
-        self.birthday = ''
+        self.birthday = None
 
     def add_phone(self, new_phone):
         if not Phone.is_phone_valid(new_phone):
@@ -70,7 +69,7 @@ class Record:
 
 class Field:
     def __init__(self):
-        self._value = ''
+        self._value = None
 
     @property
     def value(self):
