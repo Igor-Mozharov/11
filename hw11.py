@@ -47,7 +47,6 @@ class Record:
                 print('cant find this phone number')
 
     def add_birthday(self, birthday):
-        '''birthday = year.month.day'''
         if not Birthday.is_birthday_valid(birthday):
             print('not valid birthday, enter "year.month.day')
             return
@@ -141,11 +140,8 @@ def hello(_=None):
 def show_all(_=None):
     page_number = int(input('enter page number pls: '))
     page_size = int(input('enter how many record we need:  '))
-    try:
-        doit = addressbook.iterator(page_number, page_size)
-        print(next(doit))
-    except AttributeError:
-        print('no contacts')
+    doit = addressbook.iterator(page_number, page_size)
+    print(next(doit))
 
 
 @ input_error
