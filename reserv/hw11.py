@@ -7,9 +7,10 @@ class AddressBook(UserDict):
         self.data[record.name.value] = record
 
     def iterator(self, page_number, page_size):
-        data_new = list(self.data.items())
+        self.data = list(self.data.items())
         all_rec = page_number * page_size
-        yield list(data_new[(all_rec-page_size):all_rec])
+        for rec in self.data:
+            yield self.data[(all_rec-page_size):all_rec]
 
 
 class Record:
@@ -22,9 +23,7 @@ class Record:
         if not Phone.is_phone_valid(new_phone):
             print('not valid phone')
             return
-        adding_phone = Phone()
-        adding_phone.value = new_phone
-        self.phones.append(adding_phone)
+        self.phones.append(Phone(new_phone))
 
     def change_phone(self, old_phone, new_phone):
         if not Phone.is_phone_valid(new_phone):
@@ -32,9 +31,7 @@ class Record:
             return
         for phone in self.phones:
             if phone.value == old_phone:
-                changing = Phone()
-                changing.value = new_phone
-                self.phones.append(changing)
+                self.phones.append(Phone(new_phone))
                 self.phones.remove(phone)
             else:
                 print('Cant find this phone number')
@@ -51,25 +48,23 @@ class Record:
         if not Birthday.is_birthday_valid(birthday):
             print('not valid birthday, enter "year.month.day')
             return
-        birthding = Birthday()
-        birthding.value = birthday
-        self.birthday = birthding
+        self.birthday = Birthday(birthday)
 
     def days_to_birthday(self):
         if self.birthday:
             today = datetime.now().date()
-            if self.birthday.value.replace(year=today.year) >= today:
-                result = self.birthday.value.replace(
+            if self.birthday._value.replace(year=today.year) >= today:
+                result = self.birthday._value.replace(
                     year=today.year) - today
             else:
-                result = self.birthday.value.replace(
+                result = self.birthday._value.replace(
                     year=today.year) - today.replace(year=today.year - 1)
             print(result)
         else:
             print('empty')
 
     def __repr__(self):
-        return f'{self.phones}'
+        return f'{self.phones}, {self.birthday}'
 
 
 class Field:
@@ -91,7 +86,14 @@ class Name(Field):
 
 
 class Phone(Field):
-    @Field.value.setter
+    def __init__(self, phone):
+        self._value = phone
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
     def value(self, phone):
         self._value = phone
 
@@ -104,7 +106,15 @@ class Phone(Field):
 
 
 class Birthday(Field):
-    @Field.value.setter
+    def __init__(self, date: str):
+        '''date = year.month.day'''
+        self._value = datetime.strptime(date, '%Y.%m.%d').date()
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
     def value(self, birthday):
         self._value = datetime.strptime(birthday, '%Y.%m.%d').date()
 
@@ -164,7 +174,7 @@ def add(text_input: str):
 @ input_error
 def change(text_input: str):
     if text_input.split()[1] in addressbook.data:
-        old_phone = input('enter old phone number what you want to change ')
+        old_phone = input('enter phone number to change  ')
         changing = addressbook.data[text_input.split()[1]]
         changing.change_phone(old_phone, text_input.split()[2])
         print('.')
